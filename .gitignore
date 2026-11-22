@@ -1,9 +1,9 @@
 # live-build outputs
-cache/
-chroot/
-binary/
-.build/
-local/
+/cache/
+/chroot/
+/binary/
+/.build/
+/local/
 *.iso
 *.hybrid.iso
 *.contents
