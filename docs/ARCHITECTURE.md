@@ -50,6 +50,38 @@ Tor SOCKS ports (stream isolation, so activities don't share circuits):
 
 - 9050 general · 9150 Tor Browser · 9060 pentest tools (proxychains) · 9070 apt updates
 
+## 3a. Boot sequence: Tor first
+
+1. **sysinit**: `newos-firewall.service` loads the Tor-only ruleset before any network interface comes up. Nothing can leak, even during boot.
+2. **network up**: NetworkManager connects with a random MAC and no hostname. Only the `debian-tor` user is allowed out.
+3. **Tor starts**: `newos-tor-watch.service` (root) reads bootstrap progress from Tor's control socket and publishes it to `/run/newos/tor-progress`. The desktop user never gets Tor control access.
+4. **login**: the first thing on screen is the **Tor connection window** (`newos-tor-connect`, autostart phase 0) with a progress bar. Apps that try to connect before Tor is ready just wait, because their traffic is held at the Tor redirect.
+5. **stuck?** After 90 seconds the window offers **bridges** (Snowflake or pasted obfs4 lines), written to `/etc/tor/torrc.d/bridges.conf`, then restarts Tor.
+6. **connected**: the window closes with a "Connected to Tor" notification and the desktop is ready.
+
+Tor Browser is set to use the system Tor (`TOR_SKIP_LAUNCH=1`, port 9150), like Tails, so there's no Tor-over-Tor.
+
+## 3b. Per-app network setup
+
+When a new program that can use the network is installed, a **Network setup** window asks how it should connect:
+
+| Choice | How it works |
+|---|---|
+| Through Tor (recommended) | Default transparent Tor redirect |
+| Through Tor, own identity | `torsocks --isolate`, so it gets circuits no other app shares |
+| Direct, real IP | Runs with group `newos-direct`, which the firewall lets skip Tor. A second warning must be accepted. |
+| No network | Runs with group `newos-offline`, which the firewall drops |
+
+How the pieces fit:
+
+- `DPkg::Post-Invoke` runs `scan-new-apps` after every apt install. It finds new `.desktop` apps that look network-capable (network/Kali menu categories, or linking libcurl, libssl, Qt Network, NSS, libpcap and similar) and writes an override launcher in `/usr/local/share/applications` whose `Exec` goes through `newos-run`.
+- The desktop watcher (`newos-netpolicy watch`) sees the new app and pops the setup window right away. If it's missed, the window shows on the app's first launch instead.
+- Choices are saved per user in `~/.config/newos/netpolicy`. Preinstalled apps default to Tor (`/etc/newos/netpolicy.default`).
+- **App Network Settings** in the menu (`newos-netpolicy`) lists every app and lets you change its choice later.
+- Terminal tools have no launcher, so they use Tor by default. You can use `proxychains4` for their own SOCKS port, or the same groups by hand: `sg newos-direct -c "nmap -sS 10.0.0.0/24"`.
+
+Known limits for v1: the windows are plain `kdialog` dialogs and will be replaced with themed QML. Because the live user is in `newos-direct`, malware running as that user could also bypass Tor. The Whonix-style split mode closes that gap.
+
 ## 4. Amnesia checklist
 
 - [x] Boot from read-only squashfs, writes go to RAM (live-boot default)
@@ -77,7 +109,10 @@ config/hooks/live/*.hook.chroot  scripts run inside the image at build time
 config/includes.chroot/          files copied as-is into the image
   etc/tor/torrc                  Tor ports and isolation
   etc/newos/nft/*.nft            firewall per network mode
-  usr/local/bin/newos-netmode    mode switcher
+  usr/local/bin/newos-netmode    global mode switcher
+  usr/local/bin/newos-tor-connect   Tor connection window at login
+  usr/local/bin/newos-run, newos-netpolicy   per-app network routing + setup window
+  usr/local/lib/newos/           root helpers (Tor progress, bridges, new-app scan)
   usr/share/plasma/plasmoids/org.newos.livetiles   live tiles widget
 theme/palette.json               design tokens
 build.sh                         builds the ISO in a Kali container

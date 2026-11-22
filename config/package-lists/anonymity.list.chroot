@@ -8,3 +8,9 @@ onionshare
 keepassxc
 mat2
 kleopatra
+# Tor connection screen + per-app network setup window
+kdialog
+qdbus-qt6
+libnotify-bin
+netcat-openbsd
+inotify-tools

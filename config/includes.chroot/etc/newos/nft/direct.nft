@@ -16,5 +16,7 @@ table inet newos_filter {
     }
     chain output {
         type filter hook output priority 0; policy accept;
+        oifname "lo" accept
+        meta skgid "newos-offline" drop
     }
 }

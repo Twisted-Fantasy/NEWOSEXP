@@ -25,3 +25,6 @@ Log notice syslog
 #UseBridges 1
 #ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
 #ClientTransportPlugin snowflake exec /usr/bin/snowflake-client
+
+## Extra config (bridges written by the Tor connection screen)
+%include /etc/tor/torrc.d/*.conf

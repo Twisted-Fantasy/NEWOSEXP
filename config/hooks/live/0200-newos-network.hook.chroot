@@ -1,8 +1,13 @@
 #!/bin/sh
-# Tor-only firewall at boot; Tor enabled.
+# Tor-only firewall from the first moment of boot; Tor and its progress
+# watcher start automatically. Per-app route groups created here.
 set -e
+groupadd --system newos-direct  2>/dev/null || true
+groupadd --system newos-offline 2>/dev/null || true
+
 systemctl enable newos-firewall.service
 systemctl enable tor.service
+systemctl enable newos-tor-watch.service
 
 # proxychains -> dedicated isolated SOCKS port for tools
 if [ -f /etc/proxychains4.conf ]; then

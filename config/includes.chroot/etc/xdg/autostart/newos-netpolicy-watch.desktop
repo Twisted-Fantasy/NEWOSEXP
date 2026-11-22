@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=NEWOS app network setup
+Exec=/usr/local/bin/newos-netpolicy watch
+NoDisplay=true
