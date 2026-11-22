@@ -1,0 +1,22 @@
+#!/bin/sh
+# Amnesia hardening: nothing written to disk, nothing swapped.
+set -e
+
+# Never use swap
+systemctl mask swap.target
+
+# Journal in RAM only
+mkdir -p /etc/systemd/journald.conf.d
+cat > /etc/systemd/journald.conf.d/newos.conf <<'CONF'
+[Journal]
+Storage=volatile
+CONF
+
+# No core dumps
+mkdir -p /etc/systemd/coredump.conf.d
+printf '[Coredump]\nStorage=none\n' > /etc/systemd/coredump.conf.d/newos.conf
+echo '* hard core 0' > /etc/security/limits.d/newos-nocore.conf
+
+# Shell history off by default
+echo 'unset HISTFILE' > /etc/profile.d/newos-nohistory.sh
+

@@ -1,0 +1,6 @@
+#!/bin/sh
+# Wrap every preinstalled network app with newos-run (default: Tor).
+# Apps installed later get the setup window instead.
+set -e
+NEWOS_BUILD=1 /usr/local/lib/newos/scan-new-apps
+: > /var/lib/newos/pending-apps

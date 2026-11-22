@@ -1,0 +1,30 @@
+## NEWOS Tor configuration
+## Transparent proxy for all TCP + DNS, plus separate SOCKS ports so
+## different apps get different circuits (stream isolation, as in Whonix).
+
+# Default SOCKS port, isolated per destination
+SocksPort 127.0.0.1:9050 IsolateDestAddr IsolateDestPort
+# Tor Browser
+SocksPort 127.0.0.1:9150 IsolateSOCKSAuth KeepAliveIsolateSOCKSAuth
+# Pentest tools via proxychains (separate circuits from browsing)
+SocksPort 127.0.0.1:9060 IsolateDestAddr IsolateDestPort
+# Package updates
+SocksPort 127.0.0.1:9070
+
+# Transparent proxy: nftables redirects all other TCP here
+TransPort 127.0.0.1:9040 IsolateClientAddr IsolateDestAddr IsolateDestPort
+DNSPort 127.0.0.1:5353
+AutomapHostsOnResolve 1
+VirtualAddrNetworkIPv4 10.192.0.0/10
+
+ClientUseIPv6 0
+AvoidDiskWrites 1
+Log notice syslog
+
+## Bridges for censored networks: uncomment and add bridge lines.
+#UseBridges 1
+#ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
+#ClientTransportPlugin snowflake exec /usr/bin/snowflake-client
+
+## Extra config (bridges written by the Tor connection screen)
+%include /etc/tor/torrc.d/*.conf

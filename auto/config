@@ -1,0 +1,22 @@
+#!/bin/sh
+# live-build configuration for NEWOS (working name).
+# Base: Kali Rolling, so the pentest suite comes from its own archive
+# instead of mixing Kali packages into Debian.
+set -e
+
+lb config noauto \
+    --distribution kali-rolling \
+    --mirror-bootstrap http://http.kali.org/kali \
+    --mirror-binary http://http.kali.org/kali \
+    --parent-mirror-bootstrap http://http.kali.org/kali \
+    --parent-mirror-binary http://http.kali.org/kali \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --debian-installer none \
+    --binary-images iso-hybrid \
+    --bootloaders "grub-efi syslinux" \
+    --iso-application "NEWOS" \
+    --iso-volume "NEWOS" \
+    --memtest none \
+    --updates false --security false --backports false \
+    --bootappend-live "boot=live components quiet splash noswap nopersistence hostname=host username=ghost locales=en_US.UTF-8 timezone=Etc/UTC init_on_free=1 page_alloc.shuffle=1 slab_nomerge randomize_kstack_offset=on vsyscall=none mitigations=auto,nosmt ipv6.disable=1" \
+    "${@}"

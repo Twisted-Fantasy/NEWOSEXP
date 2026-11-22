@@ -1,0 +1,40 @@
+#!/usr/sbin/nft -f
+# NEWOS "tor" mode: everything goes through Tor or nowhere.
+# TCP -> Tor TransPort, DNS -> Tor DNSPort, everything else dropped.
+flush ruleset
+
+table ip newos_nat {
+    chain output {
+        type nat hook output priority -100; policy accept;
+        meta skuid "debian-tor" return
+        # Per-app choices (see newos-run): these groups skip the Tor redirect
+        meta skgid { "newos-direct", "newos-offline" } return
+        ip daddr 127.0.0.0/8 return
+        udp dport 53 redirect to :5353
+        tcp dport 53 redirect to :5353
+        ip protocol tcp redirect to :9040
+    }
+}
+
+table inet newos_filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+        iifname "lo" accept
+        ct state established,related accept
+    }
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+    chain output {
+        type filter hook output priority 0; policy drop;
+        oifname "lo" accept
+        # Apps set to "No network"
+        meta skgid "newos-offline" drop
+        # Apps set to "Direct (real IP)"
+        meta skgid "newos-direct" accept
+        meta skuid "debian-tor" ct state new,established,related accept
+        # DHCP so NetworkManager can get an address
+        meta nfproto ipv4 udp sport 68 udp dport 67 accept
+        log prefix "newos-leak-blocked: " level info limit rate 5/minute drop
+    }
+}

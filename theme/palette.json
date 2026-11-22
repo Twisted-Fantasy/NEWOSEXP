@@ -1,0 +1,19 @@
+{
+  "name": "NEWOS Neon",
+  "background":     "#0B0B14",
+  "surface":        "#141424",
+  "surfaceGlass":   "rgba(20,20,36,0.72)",
+  "text":           "#E6E6F0",
+  "textMuted":      "#8A8AA3",
+  "accentCyan":     "#00F0FF",
+  "accentMagenta":  "#FF2BD6",
+  "accentYellow":   "#F5E400",
+  "danger":         "#FF3B3B",
+  "fontMono":       "JetBrains Mono",
+  "fontUi":         "Noto Sans",
+  "meaning": {
+    "tor":     "accentCyan",
+    "direct":  "accentMagenta",
+    "offline": "accentYellow"
+  }
+}

@@ -1,0 +1,25 @@
+#!/bin/sh
+# Polls Tor's control socket and publishes bootstrap progress to
+# /run/newos/tor-progress ("<percent> <summary>") and /run/newos/tor-ready.
+# Runs as root so the desktop user never needs Tor control access.
+set -u
+SOCK=/run/tor/control
+COOKIE=/run/tor/control.authcookie
+OUT=/run/newos
+mkdir -p "$OUT"; rm -f "$OUT/tor-ready"
+echo "0 Starting Tor" > "$OUT/tor-progress"
+
+while :; do
+  if [ -S "$SOCK" ] && [ -r "$COOKIE" ]; then
+    hex=$(od -An -tx1 "$COOKIE" | tr -d ' \n')
+    line=$(printf 'AUTHENTICATE %s\r\nGETINFO status/bootstrap-phase\r\nQUIT\r\n' "$hex" \
+           | nc -NU "$SOCK" 2>/dev/null | grep -m1 'bootstrap-phase=')
+    pct=$(echo "$line" | sed -n 's/.*PROGRESS=\([0-9]*\).*/\1/p')
+    sum=$(echo "$line" | sed -n 's/.*SUMMARY="\([^"]*\)".*/\1/p')
+    if [ -n "$pct" ]; then
+      echo "$pct ${sum:-Connecting}" > "$OUT/tor-progress.tmp" && mv "$OUT/tor-progress.tmp" "$OUT/tor-progress"
+      if [ "$pct" -ge 100 ]; then touch "$OUT/tor-ready"; else rm -f "$OUT/tor-ready"; fi
+    fi
+  fi
+  sleep 1
+done

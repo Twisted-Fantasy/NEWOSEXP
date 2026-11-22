@@ -1,0 +1,9 @@
+#!/bin/sh
+# Desktop defaults: dark cyberpunk theme, SDDM autologin for live user.
+set -e
+mkdir -p /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/newos.conf <<'CONF'
+[Autologin]
+User=ghost
+Session=plasma
+CONF
