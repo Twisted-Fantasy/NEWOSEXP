@@ -1,6 +1,6 @@
 # Ragnarok architecture plan
 
-Ragnarok is a live USB Linux distro for security work. It boots amnesic like Tails, forces traffic through Tor like Whonix, ships a Kali tool suite, and has a cyberpunk desktop that mixes a macOS-style top bar and dock with Windows 8 live tiles.
+Ragnarok is a live USB Linux distro for security work. It boots amnesic like Tails, forces traffic through Tor like Whonix, ships a Kali tool suite, and has a dark glass desktop: a Windows 8 layout with live tiles, and macOS-style window buttons. Its symbol is an angular white R.
 
 ## 1. Layers
 

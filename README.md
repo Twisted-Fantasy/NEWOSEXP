@@ -1,11 +1,11 @@
 # Ragnarok
 
-An amnesic, Tor-first live Linux for security research with a cyberpunk desktop.
+An amnesic, Tor-first live Linux for security research with a dark glass desktop.
 
 - **Amnesic** like Tails: runs from RAM, leaves nothing on the machine.
 - **Tor by default** like Whonix: all traffic goes through Tor or is blocked. Switch to `direct` mode for lab work that needs your real interface.
 - **Pentest suite** from Kali Rolling's tool metapackages.
-- **Desktop**: KDE Plasma 6 themed as a neon macOS-style top bar + dock with Windows 8 style live tiles.
+- **Desktop**: KDE Plasma 6 in black glass with white text, a Windows 8 layout (taskbar, Start grid, live tiles) and macOS-style white window buttons.
 
 Read the plan: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
