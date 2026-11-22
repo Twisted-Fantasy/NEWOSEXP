@@ -1,6 +1,6 @@
 [org.kde.kdecoration2]
 library=org.kde.kwin.aurorae
-theme=__aurorae__svg__newos-glass
+theme=__aurorae__svg__ragnarok-glass
 ButtonsOnLeft=XIA
 ButtonsOnRight=
 BorderSize=Tiny

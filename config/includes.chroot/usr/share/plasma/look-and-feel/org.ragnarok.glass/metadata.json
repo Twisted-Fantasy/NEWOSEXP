@@ -1,0 +1,11 @@
+{
+    "KPlugin": {
+        "Id": "org.ragnarok.glass",
+        "Name": "Ragnarok Glass",
+        "Description": "Dark glass, white text, Windows 8 style layout",
+        "License": "GPL-3.0-or-later",
+        "Version": "0.1"
+    },
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "X-Plasma-APIVersion": "2"
+}

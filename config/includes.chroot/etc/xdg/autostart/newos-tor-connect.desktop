@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=NEWOS Tor connection
-Exec=/usr/local/bin/newos-tor-connect
-X-KDE-autostart-phase=0
-X-KDE-AutostartScript=true
-NoDisplay=true

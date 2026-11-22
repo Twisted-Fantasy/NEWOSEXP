@@ -1,0 +1,11 @@
+[Unit]
+Description=Ragnarok Tor bootstrap progress publisher
+After=tor@default.service ragnarok-firewall.service
+Wants=tor@default.service
+
+[Service]
+ExecStart=/usr/local/lib/ragnarok/tor-bootstrap-watch
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

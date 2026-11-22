@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Ragnarok Tor connection
+Exec=/usr/local/bin/ragnarok-tor-connect
+X-KDE-autostart-phase=0
+X-KDE-AutostartScript=true
+NoDisplay=true

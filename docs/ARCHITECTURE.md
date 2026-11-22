@@ -1,12 +1,12 @@
-# NEWOS architecture plan
+# Ragnarok architecture plan
 
-NEWOS (working name) is a live USB Linux distro for security work. It boots amnesic like Tails, forces traffic through Tor like Whonix, ships a Kali tool suite, and has a cyberpunk desktop that mixes a macOS-style top bar and dock with Windows 8 live tiles.
+Ragnarok is a live USB Linux distro for security work. It boots amnesic like Tails, forces traffic through Tor like Whonix, ships a Kali tool suite, and has a cyberpunk desktop that mixes a macOS-style top bar and dock with Windows 8 live tiles.
 
 ## 1. Layers
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ Desktop: KDE Plasma 6 + NEWOS shell theme                    │
+│ Desktop: KDE Plasma 6 + Ragnarok shell theme                    │
 │   top bar (global menu, net-mode badge) · floating dock ·    │
 │   Live Tiles plasmoid · neon color scheme                    │
 ├──────────────────────────────────────────────────────────────┤
@@ -36,7 +36,7 @@ NEWOS (working name) is a live USB Linux distro for security work. It boots amne
 
 ## 3. Networking modes
 
-The biggest practical conflict: many pentest techniques **cannot run over Tor**. Tor only carries TCP, so raw SYN scans, UDP, ICMP, ARP, and all Wi-Fi attacks won't work. NEWOS makes the mode explicit and always visible:
+The biggest practical conflict: many pentest techniques **cannot run over Tor**. Tor only carries TCP, so raw SYN scans, UDP, ICMP, ARP, and all Wi-Fi attacks won't work. Ragnarok makes the mode explicit and always visible:
 
 | Mode | What happens | Use for |
 |---|---|---|
@@ -44,7 +44,7 @@ The biggest practical conflict: many pentest techniques **cannot run over Tor**.
 | `direct` | Real interface, outbound open, inbound blocked. Needs typed confirmation. Magenta warning everywhere. | Lab/LAN pentests, Wi-Fi, full nmap |
 | `offline` | Loopback only | Offline cracking, analysis |
 
-Switch with `newos-netmode {tor|direct|offline|status}`. The rulesets live in `config/includes.chroot/etc/newos/nft/`.
+Switch with `ragnarok-netmode {tor|direct|offline|status}`. The rulesets live in `config/includes.chroot/etc/ragnarok/nft/`.
 
 Tor SOCKS ports (stream isolation, so activities don't share circuits):
 
@@ -52,10 +52,10 @@ Tor SOCKS ports (stream isolation, so activities don't share circuits):
 
 ## 3a. Boot sequence: Tor first
 
-1. **sysinit**: `newos-firewall.service` loads the Tor-only ruleset before any network interface comes up. Nothing can leak, even during boot.
+1. **sysinit**: `ragnarok-firewall.service` loads the Tor-only ruleset before any network interface comes up. Nothing can leak, even during boot.
 2. **network up**: NetworkManager connects with a random MAC and no hostname. Only the `debian-tor` user is allowed out.
-3. **Tor starts**: `newos-tor-watch.service` (root) reads bootstrap progress from Tor's control socket and publishes it to `/run/newos/tor-progress`. The desktop user never gets Tor control access.
-4. **login**: the first thing on screen is the **Tor connection window** (`newos-tor-connect`, autostart phase 0) with a progress bar. Apps that try to connect before Tor is ready just wait, because their traffic is held at the Tor redirect.
+3. **Tor starts**: `ragnarok-tor-watch.service` (root) reads bootstrap progress from Tor's control socket and publishes it to `/run/ragnarok/tor-progress`. The desktop user never gets Tor control access.
+4. **login**: the first thing on screen is the **Tor connection window** (`ragnarok-tor-connect`, autostart phase 0) with a progress bar. Apps that try to connect before Tor is ready just wait, because their traffic is held at the Tor redirect.
 5. **stuck?** After 90 seconds the window offers **bridges** (Snowflake or pasted obfs4 lines), written to `/etc/tor/torrc.d/bridges.conf`, then restarts Tor.
 6. **connected**: the window closes with a "Connected to Tor" notification and the desktop is ready.
 
@@ -69,18 +69,18 @@ When a new program that can use the network is installed, a **Network setup** wi
 |---|---|
 | Through Tor (recommended) | Default transparent Tor redirect |
 | Through Tor, own identity | `torsocks --isolate`, so it gets circuits no other app shares |
-| Direct, real IP | Runs with group `newos-direct`, which the firewall lets skip Tor. A second warning must be accepted. |
-| No network | Runs with group `newos-offline`, which the firewall drops |
+| Direct, real IP | Runs with group `ragnarok-direct`, which the firewall lets skip Tor. A second warning must be accepted. |
+| No network | Runs with group `ragnarok-offline`, which the firewall drops |
 
 How the pieces fit:
 
-- `DPkg::Post-Invoke` runs `scan-new-apps` after every apt install. It finds new `.desktop` apps that look network-capable (network/Kali menu categories, or linking libcurl, libssl, Qt Network, NSS, libpcap and similar) and writes an override launcher in `/usr/local/share/applications` whose `Exec` goes through `newos-run`.
-- The desktop watcher (`newos-netpolicy watch`) sees the new app and pops the setup window right away. If it's missed, the window shows on the app's first launch instead.
-- Choices are saved per user in `~/.config/newos/netpolicy`. Preinstalled apps default to Tor (`/etc/newos/netpolicy.default`).
-- **App Network Settings** in the menu (`newos-netpolicy`) lists every app and lets you change its choice later.
-- Terminal tools have no launcher, so they use Tor by default. You can use `proxychains4` for their own SOCKS port, or the same groups by hand: `sg newos-direct -c "nmap -sS 10.0.0.0/24"`.
+- `DPkg::Post-Invoke` runs `scan-new-apps` after every apt install. It finds new `.desktop` apps that look network-capable (network/Kali menu categories, or linking libcurl, libssl, Qt Network, NSS, libpcap and similar) and writes an override launcher in `/usr/local/share/applications` whose `Exec` goes through `ragnarok-run`.
+- The desktop watcher (`ragnarok-netpolicy watch`) sees the new app and pops the setup window right away. If it's missed, the window shows on the app's first launch instead.
+- Choices are saved per user in `~/.config/ragnarok/netpolicy`. Preinstalled apps default to Tor (`/etc/ragnarok/netpolicy.default`).
+- **App Network Settings** in the menu (`ragnarok-netpolicy`) lists every app and lets you change its choice later.
+- Terminal tools have no launcher, so they use Tor by default. You can use `proxychains4` for their own SOCKS port, or the same groups by hand: `sg ragnarok-direct -c "nmap -sS 10.0.0.0/24"`.
 
-Known limits for v1: the windows are plain `kdialog` dialogs and will be replaced with themed QML. Because the live user is in `newos-direct`, malware running as that user could also bypass Tor. The Whonix-style split mode closes that gap.
+Known limits for v1: the windows are plain `kdialog` dialogs and will be replaced with themed QML. Because the live user is in `ragnarok-direct`, malware running as that user could also bypass Tor. The Whonix-style split mode closes that gap.
 
 ## 4. Amnesia checklist
 
@@ -97,11 +97,11 @@ Known limits for v1: the windows are plain `kdialog` dialogs and will be replace
 
 Black and dark grey glass everywhere, white text and icons, no colour accents.
 
-- **Window frames** (macOS feel): Aurorae theme `newos-glass` in `/usr/share/aurorae/themes/`. Title bar and 1px border are translucent dark glass with rounded top corners. Close, minimize and maximize/restore are solid white circles on the **left**, showing their glyph on hover. KWin blur is enabled.
+- **Window frames** (macOS feel): Aurorae theme `ragnarok-glass` in `/usr/share/aurorae/themes/`. Title bar and 1px border are translucent dark glass with rounded top corners. Close, minimize and maximize/restore are solid white circles on the **left**, showing their glyph on hover. KWin blur is enabled.
 - **Main interface** (Windows 8 layout): one full-width glass taskbar at the bottom with a Start button (white four-square logo) that opens the full-screen app grid (Application Dashboard). The desktop shows the **Live Tiles** "Start" group: wide live tiles for network/Tor status and the clock, then square tiles for Tor Browser, Terminal, Files, Recon, Web, Exploit, Wireless, Passwords, App Network Settings and Settings.
-- **Colours**: `NEWOSGlass` colour scheme, Konsole `NEWOSGlass` profile (translucent with blur), Plasma theme breeze-dark, Papirus-Dark icons. Tokens in `theme/palette.json`.
-- **Wallpaper**: `NEWOS` (dark glass panes). The neon city wallpaper is kept as `NEWOS-Neon`.
-- **Startup, in order**: boot menu (GRUB on UEFI, syslinux on BIOS, both themed in `config/bootloaders/`), Plymouth boot splash `newos` (white logo + Windows 8 style orbiting dots), Plasma loading screen (same style, from the `org.newos.glass` look-and-feel package), then the Tor connection window, then the desktop.
+- **Colours**: `RagnarokGlass` colour scheme, Konsole `RagnarokGlass` profile (translucent with blur), Plasma theme breeze-dark, Papirus-Dark icons. Tokens in `theme/palette.json`.
+- **Wallpaper**: `Ragnarok` (dark glass panes). The neon city wallpaper is kept as `Ragnarok-Neon`.
+- **Startup, in order**: boot menu (GRUB on UEFI, syslinux on BIOS, both themed in `config/bootloaders/`), Plymouth boot splash `ragnarok` (white logo + Windows 8 style orbiting dots), Plasma loading screen (same style, from the `org.ragnarok.glass` look-and-feel package), then the Tor connection window, then the desktop.
 
 Defaults reach the live user through `/etc/skel/.config` (kdeglobals, kwinrc, plasmarc, ksplashrc, konsolerc) and the look-and-feel package's layout script.
 
@@ -113,12 +113,12 @@ config/package-lists/*.list.chroot   packages: base, anonymity, pentest, desktop
 config/hooks/live/*.hook.chroot  scripts run inside the image at build time
 config/includes.chroot/          files copied as-is into the image
   etc/tor/torrc                  Tor ports and isolation
-  etc/newos/nft/*.nft            firewall per network mode
-  usr/local/bin/newos-netmode    global mode switcher
-  usr/local/bin/newos-tor-connect   Tor connection window at login
-  usr/local/bin/newos-run, newos-netpolicy   per-app network routing + setup window
-  usr/local/lib/newos/           root helpers (Tor progress, bridges, new-app scan)
-  usr/share/plasma/plasmoids/org.newos.livetiles   live tiles widget
+  etc/ragnarok/nft/*.nft            firewall per network mode
+  usr/local/bin/ragnarok-netmode    global mode switcher
+  usr/local/bin/ragnarok-tor-connect   Tor connection window at login
+  usr/local/bin/ragnarok-run, ragnarok-netpolicy   per-app network routing + setup window
+  usr/local/lib/ragnarok/           root helpers (Tor progress, bridges, new-app scan)
+  usr/share/plasma/plasmoids/org.ragnarok.livetiles   live tiles widget
 theme/palette.json               design tokens
 build.sh                         builds the ISO in a Kali container
 ```

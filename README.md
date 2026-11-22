@@ -1,4 +1,4 @@
-# NEWOS (working name)
+# Ragnarok
 
 An amnesic, Tor-first live Linux for security research with a cyberpunk desktop.
 

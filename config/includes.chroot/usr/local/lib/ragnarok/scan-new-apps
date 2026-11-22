@@ -1,0 +1,50 @@
+#!/bin/bash
+# Runs after every apt/dpkg operation (and once at image build).
+# For each newly installed app that can use the network, it writes an
+# override launcher in /usr/local/share/applications that goes through
+# ragnarok-run, and queues the app so the setup window asks about it.
+# At build time (RAGNAROK_BUILD=1) apps get the default "tor" instead.
+set -u
+KNOWN=/var/lib/ragnarok/known-apps
+PENDING=/var/lib/ragnarok/pending-apps
+DEFAULTS=/etc/ragnarok/netpolicy.default
+OUT=/usr/local/share/applications
+mkdir -p /var/lib/ragnarok "$OUT"; touch "$KNOWN" "$PENDING" "$DEFAULTS"
+chmod 644 "$PENDING"
+
+NET_CATS='(^|;)(Network|WebBrowser|Email|Chat|InstantMessaging|IRCClient|FileTransfer|P2P|RemoteAccess|News|Feed|Telephony|VideoConference|Security|0[0-9]-[^;]*|1[0-9]-[^;]*)(;|$)'
+NET_LIBS='libcurl|libssl|libgnutls|libQt[56]Network|libsoup|libnss3|libpcap|libssh|libwebkit'
+
+uses_network() {
+  local f="$1" cats bin
+  cats=$(sed -n 's/^Categories=//p' "$f" | head -1)
+  [[ "$cats" =~ $NET_CATS ]] && return 0
+  bin=$(sed -n 's/^Exec=//p' "$f" | head -1 | awk '{print $1}')
+  bin=$(command -v "$bin" 2>/dev/null) || return 1
+  ldd "$bin" 2>/dev/null | grep -Eq "$NET_LIBS"
+}
+
+for f in /usr/share/applications/*.desktop; do
+  id=$(basename "$f" .desktop)
+  grep -qxF "$id" "$KNOWN" && continue
+  echo "$id" >> "$KNOWN"
+  grep -q '^NoDisplay=true' "$f" && continue
+  uses_network "$f" || continue
+
+  # Wrap every Exec= line; launchers prefer /usr/local/share over /usr/share.
+  sed -e "s|^Exec=|Exec=ragnarok-run $id -- |" \
+      -e 's/^DBusActivatable=.*/DBusActivatable=false/' "$f" > "$OUT/$id.desktop"
+
+  if [ "${RAGNAROK_BUILD:-0}" = 1 ]; then
+    echo "$id tor" >> "$DEFAULTS"
+  else
+    echo "$id" >> "$PENDING.tmp"
+  fi
+done
+
+if [ -s "$PENDING.tmp" ]; then
+  cat "$PENDING.tmp" >> "$PENDING"; rm -f "$PENDING.tmp"
+  # touch via rename so the desktop watcher wakes up
+  cp "$PENDING" "$PENDING.new" && mv "$PENDING.new" "$PENDING"
+fi
+rm -f "$PENDING.tmp"

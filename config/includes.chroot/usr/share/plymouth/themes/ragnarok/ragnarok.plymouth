@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Ragnarok
+Description=Ragnarok boot splash: black, white logo, Windows 8 style dots
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/ragnarok
+ScriptFile=/usr/share/plymouth/themes/ragnarok/ragnarok.script

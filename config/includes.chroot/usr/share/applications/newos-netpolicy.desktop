@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=App Network Settings
-Comment=Choose how each program connects: Tor, own Tor identity, direct, or offline
-Exec=newos-netpolicy
-Icon=preferences-system-network
-Categories=Settings;

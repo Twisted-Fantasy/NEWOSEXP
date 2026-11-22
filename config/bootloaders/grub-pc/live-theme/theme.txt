@@ -1,4 +1,4 @@
-# NEWOS boot menu (UEFI): dark glass, white text
+# Ragnarok boot menu (UEFI): dark glass, white text
 desktop-image: "../splash.png"
 title-text: ""
 message-font: "Unifont Regular 16"

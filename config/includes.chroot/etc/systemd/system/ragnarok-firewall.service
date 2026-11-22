@@ -1,0 +1,14 @@
+[Unit]
+Description=Ragnarok default firewall (Tor-only)
+DefaultDependencies=no
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/nft -f /etc/ragnarok/nft/tor.nft
+ExecStartPost=/bin/sh -c 'mkdir -p /run/ragnarok && echo tor > /run/ragnarok/netmode'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target

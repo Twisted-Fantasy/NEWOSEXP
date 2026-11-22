@@ -1,0 +1,2 @@
+// Ask how newly installed network apps should connect.
+DPkg::Post-Invoke { "[ -x /usr/local/lib/ragnarok/scan-new-apps ] && /usr/local/lib/ragnarok/scan-new-apps || true"; };
