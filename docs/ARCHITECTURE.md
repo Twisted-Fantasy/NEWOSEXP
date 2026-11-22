@@ -93,12 +93,17 @@ Known limits for v1: the windows are plain `kdialog` dialogs and will be replace
 - [ ] Emergency shutdown when the boot USB is pulled
 - [ ] Don't auto-mount internal disks (polkit rule)
 
-## 5. Desktop design: "neon glass"
+## 5. Desktop design: "dark glass"
 
-- **Top bar** (macOS): Plasma panel at top, global menu on the left, then the net-mode badge (cyan TOR / magenta DIRECT / yellow OFFLINE), clock, tray.
-- **Dock** (macOS): floating, auto-hiding bottom panel with icon-only task manager and magnification-like hover glow.
-- **Live Tiles** (Windows 8): `org.newos.livetiles` plasmoid on the desktop or in a full-screen "Start" overlay. Tiles show live data (network mode, Tor circuit, clock, running jobs) and launch tool categories.
-- **Look**: near-black `#0B0B14` glass surfaces, neon cyan / magenta / yellow accents, JetBrains Mono for headings, sharp corners on tiles, subtle scanline/glow KWin effects. Palette in `theme/palette.json`.
+Black and dark grey glass everywhere, white text and icons, no colour accents.
+
+- **Window frames** (macOS feel): Aurorae theme `newos-glass` in `/usr/share/aurorae/themes/`. Title bar and 1px border are translucent dark glass with rounded top corners. Close, minimize and maximize/restore are solid white circles on the **left**, showing their glyph on hover. KWin blur is enabled.
+- **Main interface** (Windows 8 layout): one full-width glass taskbar at the bottom with a Start button (white four-square logo) that opens the full-screen app grid (Application Dashboard). The desktop shows the **Live Tiles** "Start" group: wide live tiles for network/Tor status and the clock, then square tiles for Tor Browser, Terminal, Files, Recon, Web, Exploit, Wireless, Passwords, App Network Settings and Settings.
+- **Colours**: `NEWOSGlass` colour scheme, Konsole `NEWOSGlass` profile (translucent with blur), Plasma theme breeze-dark, Papirus-Dark icons. Tokens in `theme/palette.json`.
+- **Wallpaper**: `NEWOS` (dark glass panes). The neon city wallpaper is kept as `NEWOS-Neon`.
+- **Startup, in order**: boot menu (GRUB on UEFI, syslinux on BIOS, both themed in `config/bootloaders/`), Plymouth boot splash `newos` (white logo + Windows 8 style orbiting dots), Plasma loading screen (same style, from the `org.newos.glass` look-and-feel package), then the Tor connection window, then the desktop.
+
+Defaults reach the live user through `/etc/skel/.config` (kdeglobals, kwinrc, plasmarc, ksplashrc, konsolerc) and the look-and-feel package's layout script.
 
 ## 6. Repository layout
 

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=NEWOS
+Description=NEWOS boot splash: black, white logo, Windows 8 style dots
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/newos
+ScriptFile=/usr/share/plymouth/themes/newos/newos.script

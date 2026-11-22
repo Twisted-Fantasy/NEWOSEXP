@@ -1,9 +1,23 @@
 #!/bin/sh
-# Desktop defaults: dark cyberpunk theme, SDDM autologin for live user.
+# NEWOS look: boot splash, loading screen, desktop defaults.
 set -e
+
+# Live user logs straight in
 mkdir -p /etc/sddm.conf.d
 cat > /etc/sddm.conf.d/newos.conf <<'CONF'
 [Autologin]
 User=ghost
 Session=plasma
+
+[Theme]
+Current=breeze
 CONF
+
+
+# Boot splash: set our Plymouth theme and rebuild the initramfs with it
+plymouth-set-default-theme newos
+if command -v update-initramfs >/dev/null 2>&1; then
+  update-initramfs -u -k all
+elif command -v dracut >/dev/null 2>&1; then
+  dracut --force --regenerate-all
+fi

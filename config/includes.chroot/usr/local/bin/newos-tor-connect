@@ -7,7 +7,6 @@ set -u
 P=/run/newos/tor-progress
 STUCK_AFTER=90
 
-[ -e /run/newos/tor-ready ] && exit 0
 qdbus() { "$(command -v qdbus6 || command -v qdbus || echo /usr/lib/qt6/bin/qdbus)" "$@"; }
 
 dbus=$(kdialog --title "NEWOS · Connecting to Tor" --progressbar "Connecting to the Tor network…" 100)
@@ -30,7 +29,7 @@ while [ ! -e /run/newos/tor-ready ]; do
   fi
   sleep 1
 done
-set_p 100 "Connected to Tor"
-sleep 1
+set_p 100 "Connected to Tor. All traffic is routed through Tor."
+sleep 2
 qdbus "$ref" "$obj" close >/dev/null 2>&1
 notify-send -a NEWOS "Connected to Tor" "All traffic is routed through Tor." 2>/dev/null || true
