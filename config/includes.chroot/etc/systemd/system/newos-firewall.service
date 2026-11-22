@@ -1,0 +1,14 @@
+[Unit]
+Description=NEWOS default firewall (Tor-only)
+DefaultDependencies=no
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/nft -f /etc/newos/nft/tor.nft
+ExecStartPost=/bin/sh -c 'mkdir -p /run/newos && echo tor > /run/newos/netmode'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target

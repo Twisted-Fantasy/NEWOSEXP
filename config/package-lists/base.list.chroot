@@ -1,0 +1,14 @@
+# Core live system
+live-boot
+live-config
+live-config-systemd
+systemd-sysv
+sudo
+firmware-linux
+firmware-iwlwifi
+firmware-realtek
+network-manager
+nftables
+macchanger
+cryptsetup
+secure-delete

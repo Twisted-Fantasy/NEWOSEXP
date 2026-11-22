@@ -1,0 +1,13 @@
+#!/bin/sh
+# Tor-only firewall at boot; Tor enabled.
+set -e
+systemctl enable newos-firewall.service
+systemctl enable tor.service
+
+# proxychains -> dedicated isolated SOCKS port for tools
+if [ -f /etc/proxychains4.conf ]; then
+  sed -i 's/^socks4 \+127.0.0.1 \+9050/socks5 127.0.0.1 9060/' /etc/proxychains4.conf
+fi
+
+# Make sure no other firewall manager fights us
+systemctl disable ufw.service 2>/dev/null || true

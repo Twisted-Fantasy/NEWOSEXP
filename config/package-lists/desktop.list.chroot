@@ -1,0 +1,15 @@
+# KDE Plasma 6: the most themeable desktop for a dock + top bar + tiles layout
+kde-plasma-desktop
+sddm
+plasma-workspace
+plasma-widgets-addons
+kwin-addons
+qml6-module-qtquick-layouts
+konsole
+dolphin
+kate
+fonts-jetbrains-mono
+fonts-noto
+papirus-icon-theme
+plymouth
+plymouth-themes
