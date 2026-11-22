@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+  <g id="decoration-topleft"><path d="M0,34 V10 A10,10 0 0 1 10,0 H10 V34 Z" fill="#141416" fill-opacity="0.66"/>
+     <path d="M0.5,34 V10 A9.5,9.5 0 0 1 10,0.5" fill="none" stroke="#ffffff" stroke-opacity="0.16"/></g>
+  <g id="decoration-top"><rect x="10" y="0" width="100" height="34" fill="#141416" fill-opacity="0.66"/>
+     <rect x="10" y="0" width="100" height="1" fill="#ffffff" fill-opacity="0.16"/></g>
+  <g id="decoration-topright"><path d="M110,0 A10,10 0 0 1 120,10 V34 H110 Z" fill="#141416" fill-opacity="0.66"/>
+     <path d="M110,0.5 A9.5,9.5 0 0 1 119.5,10 V34" fill="none" stroke="#ffffff" stroke-opacity="0.16"/></g>
+  <rect id="decoration-left" x="0" y="34" width="1" height="100" fill="#ffffff" fill-opacity="0.128"/>
+  <rect id="decoration-center" x="1" y="34" width="100" height="100" fill="#141416" fill-opacity="0.66"/>
+  <rect id="decoration-right" x="101" y="34" width="1" height="100" fill="#ffffff" fill-opacity="0.128"/>
+  <rect id="decoration-bottomleft" x="0" y="134" width="1" height="1" fill="#ffffff" fill-opacity="0.128"/>
+  <rect id="decoration-bottom" x="1" y="134" width="100" height="1" fill="#ffffff" fill-opacity="0.128"/>
+  <rect id="decoration-bottomright" x="101" y="134" width="1" height="1" fill="#ffffff" fill-opacity="0.128"/>
+  <g id="decoration-inactive-topleft"><path d="M0,34 V10 A10,10 0 0 1 10,0 H10 V34 Z" fill="#141416" fill-opacity="0.55"/>
+     <path d="M0.5,34 V10 A9.5,9.5 0 0 1 10,0.5" fill="none" stroke="#ffffff" stroke-opacity="0.08"/></g>
+  <g id="decoration-inactive-top"><rect x="10" y="0" width="100" height="34" fill="#141416" fill-opacity="0.55"/>
+     <rect x="10" y="0" width="100" height="1" fill="#ffffff" fill-opacity="0.08"/></g>
+  <g id="decoration-inactive-topright"><path d="M110,0 A10,10 0 0 1 120,10 V34 H110 Z" fill="#141416" fill-opacity="0.55"/>
+     <path d="M110,0.5 A9.5,9.5 0 0 1 119.5,10 V34" fill="none" stroke="#ffffff" stroke-opacity="0.08"/></g>
+  <rect id="decoration-inactive-left" x="0" y="34" width="1" height="100" fill="#ffffff" fill-opacity="0.064"/>
+  <rect id="decoration-inactive-center" x="1" y="34" width="100" height="100" fill="#141416" fill-opacity="0.55"/>
+  <rect id="decoration-inactive-right" x="101" y="34" width="1" height="100" fill="#ffffff" fill-opacity="0.064"/>
+  <rect id="decoration-inactive-bottomleft" x="0" y="134" width="1" height="1" fill="#ffffff" fill-opacity="0.064"/>
+  <rect id="decoration-inactive-bottom" x="1" y="134" width="100" height="1" fill="#ffffff" fill-opacity="0.064"/>
+  <rect id="decoration-inactive-bottomright" x="101" y="134" width="1" height="1" fill="#ffffff" fill-opacity="0.064"/>
+  <rect id="decoration-maximized-topleft" x="0" y="0" width="1" height="34" fill="#141416" fill-opacity="0.66"/>
+  <rect id="decoration-maximized-top" x="1" y="0" width="100" height="34" fill="#141416" fill-opacity="0.66"/>
+  <rect id="decoration-maximized-topright" x="101" y="0" width="1" height="34" fill="#141416" fill-opacity="0.66"/>
+  <rect id="decoration-maximized-inactive-topleft" x="0" y="0" width="1" height="34" fill="#141416" fill-opacity="0.55"/>
+  <rect id="decoration-maximized-inactive-top" x="1" y="0" width="100" height="34" fill="#141416" fill-opacity="0.55"/>
+  <rect id="decoration-maximized-inactive-topright" x="101" y="0" width="1" height="34" fill="#141416" fill-opacity="0.55"/>
+</svg>

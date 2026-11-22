@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
+  <defs>
+    <radialGradient id="bg" cx="0.7" cy="0.25" r="1.1">
+      <stop offset="0" stop-color="#2a2a2e"/>
+      <stop offset="0.45" stop-color="#141416"/>
+      <stop offset="1" stop-color="#050506"/>
+    </radialGradient>
+    <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.03"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.07"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft" filterUnits="userSpaceOnUse" x="-1000" y="-1000" width="6000" height="4500"><feGaussianBlur stdDeviation="140"/></filter>
+    <filter id="grain" filterUnits="userSpaceOnUse" x="0" y="0" width="3840" height="2160"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0"/></filter>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#bg)"/>
+  <g filter="url(#soft)">
+    <ellipse cx="2900" cy="500" rx="900" ry="520" fill="#5a5a60" opacity="0.45"/>
+    <ellipse cx="700" cy="1800" rx="1100" ry="420" fill="#3a3a40" opacity="0.5"/>
+  </g>
+  <g transform="rotate(-32 1920 1080)">
+    <rect x="1250" y="-400" width="560" height="3200" fill="url(#pane)"/>
+    <rect x="1250" y="-400" width="3" height="3200" fill="url(#edge)" transform="rotate(0)"/>
+    <rect x="1900" y="-400" width="260" height="3200" fill="url(#pane)" opacity="0.8"/>
+    <rect x="2157" y="-400" width="2" height="3200" fill="#ffffff" opacity="0.18"/>
+    <rect x="2260" y="-400" width="900" height="3200" fill="url(#pane)" opacity="0.6"/>
+    <rect x="2260" y="-400" width="2" height="3200" fill="#ffffff" opacity="0.12"/>
+  </g>
+  <rect width="3840" height="2160" filter="url(#grain)"/>
+</svg>

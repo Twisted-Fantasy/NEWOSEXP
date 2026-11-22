@@ -1,4 +1,4 @@
-## NEWOS Tor configuration
+## Ragnarok Tor configuration
 ## Transparent proxy for all TCP + DNS, plus separate SOCKS ports so
 ## different apps get different circuits (stream isolation, as in Whonix).
 

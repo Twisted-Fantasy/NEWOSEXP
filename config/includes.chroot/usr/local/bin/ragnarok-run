@@ -1,0 +1,25 @@
+#!/bin/bash
+# ragnarok-run APP_ID -- COMMAND [ARGS...]
+# Starts an app with the network route chosen for it:
+#   tor           shared Tor circuit (transparent proxy, the default)
+#   tor-isolated  its own Tor identity (torsocks --isolate)
+#   direct        real IP, bypasses Tor (group ragnarok-direct)
+#   offline       no network at all (group ragnarok-offline)
+# If the app has no choice yet, the network setup window asks first.
+set -u
+id="$1"; shift
+[ "${1:-}" = "--" ] && shift
+
+mode=$(ragnarok-netpolicy get "$id")
+if [ "$mode" = ask ]; then
+  mode=$(ragnarok-netpolicy ask "$id") || exit 1
+fi
+
+quoted=$(printf '%q ' "$@")
+case "$mode" in
+  tor)          exec "$@" ;;
+  tor-isolated) exec torsocks --isolate "$@" ;;
+  direct)       exec sg ragnarok-direct -c "exec $quoted" ;;
+  offline)      exec sg ragnarok-offline -c "exec $quoted" ;;
+  *)            echo "ragnarok-run: unknown mode '$mode' for $id" >&2; exit 1 ;;
+esac

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build the NEWOS ISO inside a Kali Rolling container.
+# Build the Ragnarok ISO inside a Kali Rolling container.
 # Needs Docker (or Podman) and ~30 GB free disk. Output: ./live-image-amd64.hybrid.iso
 set -eu
 ENGINE="${ENGINE:-docker}"

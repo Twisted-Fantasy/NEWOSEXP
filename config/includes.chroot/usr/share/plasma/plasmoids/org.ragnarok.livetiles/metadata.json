@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Id": "org.ragnarok.livetiles",
+        "Name": "Ragnarok Live Tiles",
+        "Description": "Windows 8 style live tiles for the Ragnarok desktop",
+        "Category": "Utilities",
+        "Icon": "view-grid",
+        "License": "GPL-3.0-or-later",
+        "Version": "0.1"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

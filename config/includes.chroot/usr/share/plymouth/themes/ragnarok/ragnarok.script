@@ -1,0 +1,72 @@
+# Ragnarok boot splash. Black screen, white logo, five dots orbiting
+# like the Windows 8 boot spinner, and a status line underneath.
+
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+W = Window.GetWidth();
+H = Window.GetHeight();
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetX(W / 2 - logo.image.GetWidth() / 2);
+logo.sprite.SetY(H / 2 - logo.image.GetHeight() / 2 - 60);
+logo.sprite.SetOpacity(0);
+
+dot_image = Image("dot.png").Scale(7, 7);
+centre_x = W / 2;
+centre_y = H / 2 + logo.image.GetHeight() / 2 + 30;
+radius = 22;
+for (i = 0; i < 5; i++) {
+    dots[i] = Sprite(dot_image);
+    dots[i].SetOpacity(0);
+}
+
+status_image = Image.Text("Starting Ragnarok", 0.7, 0.7, 0.72, 1, "Sans 12");
+status = Sprite(status_image);
+status.SetX(W / 2 - status_image.GetWidth() / 2);
+status.SetY(centre_y + radius + 40);
+
+frame = 0;
+cycle = 110;   # frames per orbit (~2.2 s at 50 fps)
+
+fun ease(t) {
+    # smooth in-out, so dots bunch up and spread out like Windows 8
+    if (t < 0.5) return 4 * t * t * t;
+    u = 2 * t - 2;
+    return 0.5 * u * u * u + 1;
+}
+
+fun refresh() {
+    frame++;
+    if (frame < 25) logo.sprite.SetOpacity(frame / 25);
+    else logo.sprite.SetOpacity(1);
+
+    for (i = 0; i < 5; i++) {
+        t = (frame - i * 7) % (cycle + 35);
+        if (t < 0 || t > cycle) {
+            dots[i].SetOpacity(0);
+        } else {
+            a = ease(t / cycle) * 2 * Math.Pi - Math.Pi / 2;
+            dots[i].SetX(centre_x + radius * Math.Cos(a) - 3);
+            dots[i].SetY(centre_y + radius * Math.Sin(a) - 3);
+            dots[i].SetOpacity(1);
+        }
+    }
+}
+Plymouth.SetRefreshFunction(refresh);
+
+fun message_cb(text) {
+    status_image = Image.Text(text, 0.7, 0.7, 0.72, 1, "Sans 12");
+    status.SetImage(status_image);
+    status.SetX(W / 2 - status_image.GetWidth() / 2);
+}
+Plymouth.SetMessageFunction(message_cb);
+
+# Password prompt (only used if an encrypted volume is ever added)
+fun password_cb(prompt, bullets) {
+    s = prompt + "  ";
+    for (i = 0; i < bullets; i++) s += "*";
+    message_cb(s);
+}
+Plymouth.SetDisplayPasswordFunction(password_cb);
