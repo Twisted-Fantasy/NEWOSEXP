@@ -14,6 +14,12 @@ Current=breeze
 CONF
 
 
+# Window frames: Aurorae is a separate package in newer Plasma releases.
+# Install it if the archive has it, without failing the build if not.
+apt-get install -y --no-install-recommends aurorae 2>/dev/null \
+  || apt-get install -y --no-install-recommends kwin-decoration-aurorae 2>/dev/null \
+  || echo "W: Aurorae package not found; window frames fall back to Breeze"
+
 # Boot splash: set our Plymouth theme and rebuild the initramfs with it
 plymouth-set-default-theme ragnarok
 if command -v update-initramfs >/dev/null 2>&1; then

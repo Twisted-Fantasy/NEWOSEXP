@@ -13,6 +13,7 @@ SocksPort 127.0.0.1:9070
 
 # Transparent proxy: nftables redirects all other TCP here
 TransPort 127.0.0.1:9040 IsolateClientAddr IsolateDestAddr IsolateDestPort
+DNSPort 127.0.0.1:53
 DNSPort 127.0.0.1:5353
 AutomapHostsOnResolve 1
 VirtualAddrNetworkIPv4 10.192.0.0/10

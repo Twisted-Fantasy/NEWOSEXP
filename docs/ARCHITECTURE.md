@@ -89,6 +89,7 @@ Known limits for v1: the windows are plain `kdialog` dialogs and will be replace
 - [x] Volatile journald, no core dumps, no shell history
 - [x] Kernel hardening flags: `init_on_free=1 page_alloc.shuffle=1 slab_nomerge randomize_kstack_offset=on vsyscall=none`
 - [x] Hostname `host`, UTC timezone, random MACs
+- [x] DNS answered only by Tor (static `/etc/resolv.conf` → 127.0.0.1:53, NetworkManager `dns=none`)
 - [ ] Wipe RAM on shutdown (Tails does this with a kexec/initramfs step)
 - [ ] Emergency shutdown when the boot USB is pulled
 - [ ] Don't auto-mount internal disks (polkit rule)
