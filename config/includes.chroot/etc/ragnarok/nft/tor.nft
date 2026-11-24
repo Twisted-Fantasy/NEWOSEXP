@@ -4,6 +4,15 @@
 flush ruleset
 
 table ip ragnarok_nat {
+    # Split mode: everything the workstation sends to the gateway goes to Tor
+    chain prerouting {
+        type nat hook prerouting priority -100; policy accept;
+        iifname "veth-gw" ip daddr 10.152.152.10 tcp dport { 9050, 9060, 9150 } return
+        iifname "veth-gw" udp dport 53 redirect to :53
+        iifname "veth-gw" tcp dport 53 redirect to :53
+        iifname "veth-gw" ip protocol tcp redirect to :9040
+    }
+
     chain output {
         type nat hook output priority -100; policy accept;
         meta skuid "debian-tor" return
@@ -21,6 +30,9 @@ table inet ragnarok_filter {
         type filter hook input priority 0; policy drop;
         iifname "lo" accept
         ct state established,related accept
+        # Split mode: the workstation may reach Tor's ports and nothing else
+        iifname "veth-gw" tcp dport { 53, 9040, 9050, 9060, 9150 } accept
+        iifname "veth-gw" udp dport 53 accept
     }
     chain forward {
         type filter hook forward priority 0; policy drop;

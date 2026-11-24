@@ -1,0 +1,19 @@
+#!/usr/sbin/nft -f
+# Ragnarok Split mode, workstation side. The only route out is the gateway
+# (which sends everything into Tor). Apps set to "No network" stay offline.
+flush ruleset
+
+table inet ragnarok_ws {
+    chain output {
+        type filter hook output priority 0; policy accept;
+        oifname "lo" accept
+        meta skgid "ragnarok-offline" drop
+        oifname "veth-ws" ip daddr 10.152.152.10 accept
+        drop
+    }
+    chain input {
+        type filter hook input priority 0; policy drop;
+        iifname "lo" accept
+        ct state established,related accept
+    }
+}

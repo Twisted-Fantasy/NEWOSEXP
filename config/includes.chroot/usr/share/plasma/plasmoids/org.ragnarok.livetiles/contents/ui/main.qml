@@ -14,6 +14,7 @@ PlasmoidItem {
     readonly property int gap: 8
     property string netMode: "…"
     property string torPercent: "0"
+    property bool split: false
     property date now: new Date()
 
     preferredRepresentation: fullRepresentation
@@ -24,11 +25,12 @@ PlasmoidItem {
     // Live data: network mode and Tor bootstrap progress
     P5Support.DataSource {
         engine: "executable"
-        connectedSources: ["ragnarok-netmode status", "cut -d' ' -f1 /run/ragnarok/tor-progress"]
+        connectedSources: ["ragnarok-netmode status", "cut -d' ' -f1 /run/ragnarok/tor-progress", "cat /run/ragnarok/split"]
         interval: 3000
         onNewData: (source, data) => {
             const out = (data.stdout || "").trim()
             if (source.startsWith("ragnarok-netmode")) root.netMode = out
+            else if (source.endsWith("/split")) root.split = (out === "split")
             else root.torPercent = out
         }
     }
@@ -63,8 +65,10 @@ PlasmoidItem {
                 label: "Network"
                 icon: root.netMode === "tor" ? "security-high-symbolic"
                     : root.netMode === "direct" ? "security-low-symbolic" : "network-offline-symbolic"
-                bigText: root.netMode === "tor" ? "TOR" : root.netMode.toUpperCase()
-                subText: root.netMode === "tor"
+                bigText: root.split ? "SPLIT" : root.netMode === "tor" ? "TOR" : root.netMode.toUpperCase()
+                subText: root.split
+                         ? (root.torPercent === "100" ? "Sealed behind Tor gateway" : "Gateway connecting… " + root.torPercent + "%")
+                         : root.netMode === "tor"
                          ? (root.torPercent === "100" ? "Connected · anonymous" : "Connecting… " + root.torPercent + "%")
                          : root.netMode === "direct" ? "Real IP · not anonymous" : "No network"
                 onClicked: root.run("ragnarok-netpolicy")

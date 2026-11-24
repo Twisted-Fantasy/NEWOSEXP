@@ -1,0 +1,10 @@
+#!/bin/sh
+# Runs inside the workstation namespace. Apps there expect Tor on 127.0.0.1
+# (DNS on :53, SOCKS on :9050/:9150/:9060). Forward those to the gateway.
+GW=10.152.152.10
+socat UDP4-RECVFROM:53,bind=127.0.0.1,fork UDP4-SENDTO:$GW:53 &
+socat TCP4-LISTEN:53,bind=127.0.0.1,reuseaddr,fork TCP4:$GW:53 &
+for p in 9050 9150 9060; do
+  socat TCP4-LISTEN:$p,bind=127.0.0.1,reuseaddr,fork TCP4:$GW:$p &
+done
+wait

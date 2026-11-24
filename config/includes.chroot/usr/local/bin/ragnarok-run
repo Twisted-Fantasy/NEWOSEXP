@@ -15,6 +15,13 @@ if [ "$mode" = ask ]; then
   mode=$(ragnarok-netpolicy ask "$id") || exit 1
 fi
 
+# Split mode: "direct" is impossible by design, the workstation has no real
+# network. Run through Tor instead and say so.
+if [ "$mode" = direct ] && [ -e /run/ragnarok/split ]; then
+  notify-send -a Ragnarok "Split mode" "$id runs through Tor: direct access is disabled in Split mode." 2>/dev/null || true
+  mode=tor
+fi
+
 quoted=$(printf '%q ' "$@")
 case "$mode" in
   tor)          exec "$@" ;;

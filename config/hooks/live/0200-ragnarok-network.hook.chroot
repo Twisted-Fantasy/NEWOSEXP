@@ -20,3 +20,6 @@ systemctl disable ufw.service 2>/dev/null || true
 # DNS goes to Tor only: no local resolver in the way
 systemctl mask systemd-resolved.service 2>/dev/null || true
 rm -f /etc/resolv.conf.orig
+
+# Split mode units (they only run when booted with ragnarok.split=1)
+systemctl enable ragnarok-split.service ragnarok-split-forwarders.service
