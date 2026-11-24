@@ -1,0 +1,14 @@
+[Unit]
+Description=Ragnarok Split mode: Tor DNS/SOCKS forwarders inside the workstation
+ConditionKernelCommandLine=ragnarok.split=1
+Requires=ragnarok-split.service
+After=ragnarok-split.service tor@default.service
+Before=sddm.service display-manager.service
+
+[Service]
+NetworkNamespacePath=/run/netns/ws
+ExecStart=/usr/local/lib/ragnarok/split-forwarders
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,43 @@
+#!/bin/sh
+# Ragnarok Split mode (boot option "Ragnarok Split", kernel arg ragnarok.split=1).
+#
+# Whonix-style separation on one machine: the whole desktop session and every
+# tool run in a separate network namespace ("workstation") whose only link is a
+# virtual cable to this side ("gateway"), where Tor runs. The workstation never
+# sees the real network interface, so a tool can't learn or use the real IP.
+#
+#   workstation ns "ws"            gateway (root ns)
+#   veth-ws 10.152.152.11  <---->  veth-gw 10.152.152.10 --> Tor --> internet
+set -eu
+GW=10.152.152.10
+WS=10.152.152.11
+
+ip netns add ws 2>/dev/null || true
+if ! ip link show veth-gw >/dev/null 2>&1; then
+  ip link add veth-gw type veth peer name veth-ws
+  ip link set veth-ws netns ws
+fi
+ip addr replace "$GW/24" dev veth-gw
+ip link set veth-gw up
+ip -n ws link set lo up
+ip -n ws addr replace "$WS/24" dev veth-ws
+ip -n ws link set veth-ws up
+ip -n ws route replace default via "$GW"
+
+# Workstation firewall: gateway only, and honour per-app "No network".
+ip netns exec ws nft -f /etc/ragnarok/nft/split-ws.nft
+
+# Never route between the two sides; everything must go through Tor.
+sysctl -qw net.ipv4.ip_forward=0
+
+# Tor listens on the gateway side of the cable too.
+cat > /etc/tor/torrc.d/50-split.conf <<CONF
+SocksPort $GW:9050 IsolateDestAddr IsolateDestPort
+SocksPort $GW:9150 IsolateSOCKSAuth KeepAliveIsolateSOCKSAuth
+SocksPort $GW:9060 IsolateDestAddr IsolateDestPort
+TransPort $GW:9040 IsolateClientAddr IsolateDestAddr IsolateDestPort
+DNSPort $GW:53
+CONF
+
+mkdir -p /run/ragnarok
+echo split > /run/ragnarok/split

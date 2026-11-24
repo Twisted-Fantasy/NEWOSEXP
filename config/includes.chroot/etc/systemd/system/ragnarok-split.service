@@ -1,0 +1,14 @@
+[Unit]
+Description=Ragnarok Split mode: workstation namespace behind a Tor gateway
+ConditionKernelCommandLine=ragnarok.split=1
+After=ragnarok-firewall.service local-fs.target
+Before=tor@default.service sddm.service display-manager.service
+Wants=tor@default.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/lib/ragnarok/split-setup
+
+[Install]
+WantedBy=multi-user.target

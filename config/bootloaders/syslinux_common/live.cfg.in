@@ -1,0 +1,18 @@
+label ragnarok
+	menu label ^Ragnarok
+	menu default
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@
+
+label ragnarok-split
+	menu label Ragnarok ^Split (tools sealed behind a Tor gateway)
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@ ragnarok.split=1
+
+label ragnarok-failsafe
+	menu label Ragnarok (^fail-safe graphics)
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE_FAILSAFE@

@@ -1,0 +1,16 @@
+#!/bin/sh
+# In Split mode, start the login screen and every user session inside the
+# workstation network namespace, so all apps only ever see the Tor gateway.
+grep -qw 'ragnarok.split=1' /proc/cmdline || exit 0
+out="$1"
+for unit in sddm.service user@.service; do
+  mkdir -p "$out/$unit.d"
+  cat > "$out/$unit.d/50-ragnarok-split.conf" <<CONF
+[Unit]
+Requires=ragnarok-split.service ragnarok-split-forwarders.service
+After=ragnarok-split.service ragnarok-split-forwarders.service
+
+[Service]
+NetworkNamespacePath=/run/netns/ws
+CONF
+done

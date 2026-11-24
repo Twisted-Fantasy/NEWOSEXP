@@ -1,0 +1,9 @@
+{
+    "KPlugin": {
+        "Id": "ragnarok-glass",
+        "Name": "Ragnarok Glass",
+        "Description": "Dark glass window frame with white macOS-style buttons",
+        "License": "GPL-3.0-or-later",
+        "Version": "0.2"
+    }
+}

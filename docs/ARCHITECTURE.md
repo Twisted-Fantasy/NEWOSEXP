@@ -30,7 +30,7 @@ Ragnarok is a live USB Linux distro for security work. It boots amnesic like Tai
 |---|---|---|---|
 | Base | **Kali Rolling** | Tools come from their native archive. Mixing Kali repos into Debian stable breaks upgrades ("FrankenDebian"). | Debian stable + hand-picked tools (more stable, older/fewer tools) |
 | Build tool | **live-build** | What both Tails and Kali use; config is plain files in git. | mkosi, debos |
-| Tor model | **Single-system transparent Tor (Tails-style)** with per-purpose SOCKS ports for stream isolation | Works from one USB on any laptop. | **Whonix-style gateway + workstation VMs**: stronger (a compromised tool can't learn your real IP), but needs a hypervisor and ~2× RAM. Planned as an optional "split mode" later. |
+| Tor model | **Both, picked at boot.** "Ragnarok" = single-system transparent Tor (Tails-style). "Ragnarok Split" = the whole session runs in a sealed workstation namespace behind a Tor gateway (Whonix-style). | Tails-style works everywhere and allows direct mode; Split stops tools from ever seeing the real network. | Full Whonix VMs (gateway + workstation VMs): stronger still, since even root in the workstation can't escape, but needs a hypervisor and ~2x RAM. Possible later. |
 | Desktop | **KDE Plasma 6** | Panels, floating dock, global menu, QML widgets and KWin effects cover every UI goal without writing a compositor. | Custom Wayland shell (months of work), GNOME + extensions |
 | Persistence | **None in v1** | Amnesic by default. | Optional LUKS persistence partition (live-boot supports it) in v2 |
 
@@ -82,6 +82,24 @@ How the pieces fit:
 
 Known limits for v1: the windows are plain `kdialog` dialogs and will be replaced with themed QML. Because the live user is in `ragnarok-direct`, malware running as that user could also bypass Tor. The Whonix-style split mode closes that gap.
 
+## 3c. Split mode (Whonix-style)
+
+Pick **Ragnarok Split** in the boot menu (kernel argument `ragnarok.split=1`).
+
+```
+ workstation namespace "ws"                 gateway (main system)
+ desktop, browser, every tool              NetworkManager, real NIC, Tor
+ veth-ws 10.152.152.11  ── virtual cable ──  veth-gw 10.152.152.10 ──► Tor ──► internet
+```
+
+- `ragnarok-split.service` creates the namespace and the cable, loads the workstation firewall (`split-ws.nft`: gateway only) and tells Tor to listen on the gateway side (`/etc/tor/torrc.d/50-split.conf`).
+- A systemd generator puts `sddm.service` and `user@.service` into the namespace, so the login screen, Plasma and every app start there and never see the real interface.
+- On the gateway, `tor.nft` sends all TCP arriving on `veth-gw` into Tor's TransPort and DNS into Tor's DNSPort. Nothing is forwarded or routed.
+- `ragnarok-split-forwarders.service` (socat, inside the namespace) keeps the usual `127.0.0.1` DNS and SOCKS ports working for apps.
+- Direct mode is disabled: `ragnarok-netmode` refuses to switch, and apps set to "direct" run through Tor with a notice. "No network" still works.
+
+Limits: this is namespace isolation, not a VM. A process that becomes root inside the session could leave the namespace, and apps can still ask NetworkManager over D-Bus for the local LAN address. Full gateway and workstation VMs would close both, at the cost of a hypervisor and about double the RAM.
+
 ## 4. Amnesia checklist
 
 - [x] Boot from read-only squashfs, writes go to RAM (live-boot default)
@@ -89,6 +107,7 @@ Known limits for v1: the windows are plain `kdialog` dialogs and will be replace
 - [x] Volatile journald, no core dumps, no shell history
 - [x] Kernel hardening flags: `init_on_free=1 page_alloc.shuffle=1 slab_nomerge randomize_kstack_offset=on vsyscall=none`
 - [x] Hostname `host`, UTC timezone, random MACs
+- [x] DNS answered only by Tor (static `/etc/resolv.conf` → 127.0.0.1:53, NetworkManager `dns=none`)
 - [ ] Wipe RAM on shutdown (Tails does this with a kexec/initramfs step)
 - [ ] Emergency shutdown when the boot USB is pulled
 - [ ] Don't auto-mount internal disks (polkit rule)
